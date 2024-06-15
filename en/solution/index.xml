@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Application Scenarios | AtlasGraph on AtlasGraph</title>
+    <link>https://atlasgraph.io/en/solution/</link>
+    <description>Recent content in Application Scenarios | AtlasGraph on AtlasGraph</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <copyright>© 北京海致星图科技有限公司</copyright>
+    <atom:link href="https://atlasgraph.io/en/solution/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>
