@@ -1,10 +1,968 @@
-<!DOCTYPE html>
-<html lang="zh">
-  <head>
-    <title>https://atlasgraph.io/zh/</title>
-    <link rel="canonical" href="https://atlasgraph.io/zh/">
-    <meta name="robots" content="noindex">
-    <meta charset="utf-8">
-    <meta http-equiv="refresh" content="0; url=https://atlasgraph.io/zh/">
-  </head>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Atlas 图模融合基础设施：以 AtlasGraph 为图数据底座，连接 AtlasRAG 语义推理与 AtlasHarness 可控执行。">
+  <meta name="theme-color" content="#ffffff">
+  <title>Atlas | 图模融合基础设施</title>
+  <link rel="icon" href="images/favicon.png">
+  <style>
+    :root {
+      --ink: #101828;
+      --ink-2: #344054;
+      --muted: #667085;
+      --line: #dbe7f6;
+      --line-strong: #b8d1f2;
+      --blue: #155eef;
+      --blue-dark: #0b48c5;
+      --blue-deep: #073590;
+      --cyan: #06b6d4;
+      --cyan-dark: #0e7490;
+      --blue-soft: #eaf3ff;
+      --surface: #f5f9ff;
+      --white: #ffffff;
+      --green: #13a56f;
+      --max: 1240px;
+      --header: 72px;
+      --radius: 8px;
+      --shadow: 0 24px 70px rgba(21, 94, 239, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--white);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; max-width: 100%; }
+    button, a { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+    [id] { scroll-margin-top: calc(var(--header) + 12px); }
+    button { letter-spacing: 0; }
+    :focus-visible { outline: 3px solid rgba(6, 182, 212, 0.42); outline-offset: 3px; }
+    ::selection { color: var(--white); background: var(--blue); }
+
+    .skip-link {
+      position: fixed;
+      z-index: 1000;
+      left: 16px;
+      top: -60px;
+      padding: 10px 14px;
+      color: var(--white);
+      background: var(--blue);
+      border-radius: 4px;
+      transition: top 160ms ease;
+    }
+    .skip-link:focus { top: 12px; }
+
+    .shell { width: min(calc(100% - 48px), var(--max)); margin-inline: auto; }
+    .section { padding: 112px 0; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 18px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--cyan); }
+    .section-title {
+      max-width: 760px;
+      margin: 0;
+      font-size: 44px;
+      line-height: 1.14;
+      font-weight: 720;
+      letter-spacing: 0;
+    }
+    .section-copy {
+      max-width: 620px;
+      margin: 20px 0 0;
+      color: var(--ink-2);
+      font-size: 18px;
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 48px;
+      margin-bottom: 64px;
+    }
+    .section-head .section-copy { margin: 0; max-width: 470px; }
+    .label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 2px 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      color: var(--blue-dark);
+      background: var(--white);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .site-header {
+      position: sticky;
+      z-index: 100;
+      top: 0;
+      height: var(--header);
+      border-bottom: 1px solid rgba(219, 231, 246, 0.9);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+    }
+    .nav {
+      display: grid;
+      grid-template-columns: 210px 1fr 210px;
+      align-items: center;
+      height: 100%;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; width: fit-content; }
+    .brand img { width: 34px; height: 34px; object-fit: contain; }
+    .brand-name { font-size: 21px; font-weight: 780; line-height: 1; }
+    .brand-note { display: block; margin-top: 5px; color: var(--muted); font-size: 9px; font-weight: 700; line-height: 1; }
+    .nav-links { display: flex; align-items: center; justify-content: center; gap: 34px; }
+    .nav-links a {
+      position: relative;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--ink-2);
+      font-size: 14px;
+      font-weight: 620;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 100%;
+      bottom: 5px;
+      height: 2px;
+      background: var(--blue);
+      transition: right 180ms ease;
+    }
+    .nav-links a:hover::after { right: 0; }
+    .nav-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    .lang-switch {
+      display: inline-flex;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    .lang-switch button {
+      min-width: 40px;
+      min-height: 34px;
+      padding: 0 9px;
+      border: 0;
+      border-radius: 4px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .lang-switch button[aria-pressed="true"] { color: var(--blue-dark); background: var(--white); box-shadow: 0 1px 4px rgba(16, 24, 40, 0.08); }
+    .nav-cta, .button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 17px;
+      border: 1px solid var(--blue);
+      border-radius: 6px;
+      color: var(--white);
+      background: var(--blue);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+    .nav-cta:hover, .button:hover { transform: translateY(-2px); background: var(--blue-dark); border-color: var(--blue-dark); }
+    .button.secondary { color: var(--ink); background: var(--white); border-color: var(--line-strong); }
+    .button.secondary:hover { color: var(--blue-dark); background: var(--blue-soft); border-color: var(--blue); }
+    .button svg { width: 16px; height: 16px; }
+    .menu-button { display: none; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--white); cursor: pointer; }
+    .menu-button svg { width: 20px; height: 20px; margin: auto; }
+
+    .hero {
+      position: relative;
+      min-height: calc(100svh - var(--header));
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background: var(--white);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 34%;
+      background: var(--surface);
+      clip-path: polygon(0 22%, 100% 0, 100% 100%, 0 100%);
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100svh - var(--header));
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(540px, 1.14fr);
+      align-items: center;
+      gap: 36px;
+      padding-top: 62px;
+      padding-bottom: 76px;
+    }
+    .hero-copy { position: relative; z-index: 2; max-width: 650px; }
+    .hero-kicker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 24px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 760;
+      text-transform: uppercase;
+    }
+    .hero-kicker i { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.12); }
+    .hero h1 { margin: 0; font-size: 78px; font-weight: 800; line-height: 0.96; letter-spacing: 0; }
+    .hero-heading { margin: 22px 0 0; max-width: 640px; font-size: 34px; font-weight: 690; line-height: 1.2; letter-spacing: 0; }
+    .hero-description { max-width: 610px; margin: 24px 0 0; color: var(--ink-2); font-size: 18px; line-height: 1.75; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .hero-footnote { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 30px; color: var(--muted); font-size: 12px; font-weight: 640; }
+    .hero-footnote span { display: inline-flex; align-items: center; gap: 7px; }
+    .hero-footnote span::before { content: ""; width: 5px; height: 5px; background: var(--cyan-dark); border-radius: 50%; }
+
+    .network-stage { position: relative; min-height: 640px; align-self: stretch; }
+    .network-stage::before {
+      content: "";
+      position: absolute;
+      inset: 11% 2% 7% 8%;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+    .network-stage::after {
+      content: "";
+      position: absolute;
+      left: 14%;
+      top: 18%;
+      width: 62%;
+      aspect-ratio: 1;
+      border: 1px dashed var(--line-strong);
+      border-radius: 50%;
+    }
+    .hero-network { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .hero-network .edge { fill: none; stroke: #9cc0f4; stroke-width: 1.5; }
+    .hero-network .edge.signal { stroke: var(--blue); stroke-width: 2.2; stroke-dasharray: 8 10; animation: signal 5s linear infinite; }
+    .hero-network .edge.cyan { stroke: var(--cyan); }
+    .hero-network .node { fill: var(--white); stroke: var(--blue); stroke-width: 2; }
+    .hero-network .node.core { fill: var(--blue); stroke: var(--white); stroke-width: 7; }
+    .hero-network .node.accent { fill: var(--cyan); stroke: var(--white); stroke-width: 5; }
+    .hero-network text { font-family: inherit; letter-spacing: 0; }
+    .hero-network .micro { fill: var(--muted); font-size: 11px; font-weight: 650; }
+    .hero-network .product { fill: var(--ink); font-size: 16px; font-weight: 760; }
+    .hero-network .core-label { fill: var(--white); font-size: 15px; font-weight: 760; text-anchor: middle; }
+    .hero-network .pulse { fill: none; stroke: rgba(21, 94, 239, 0.25); stroke-width: 2; transform-origin: center; animation: pulse 3.5s ease-out infinite; }
+    .stage-caption {
+      position: absolute;
+      z-index: 3;
+      right: 0;
+      bottom: 9%;
+      display: flex;
+      gap: 24px;
+      padding: 13px 16px;
+      border-left: 2px solid var(--cyan);
+      background: rgba(255,255,255,0.88);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    .signal-bar { position: relative; z-index: 3; margin-top: -30px; }
+    .signal-inner {
+      min-height: 82px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 16px 50px rgba(16, 24, 40, 0.08);
+    }
+    .signal-item { padding: 0 34px; border-right: 1px solid var(--line); }
+    .signal-item:last-child { border-right: 0; }
+    .signal-item strong { display: block; color: var(--blue-dark); font-size: 14px; }
+    .signal-item span { color: var(--muted); font-size: 12px; }
+
+    .system-section { padding-top: 132px; }
+    .product-rail { border-top: 1px solid var(--line-strong); }
+    .product-item {
+      display: grid;
+      grid-template-columns: 88px 220px minmax(240px, 0.9fr) minmax(320px, 1.1fr) 32px;
+      align-items: center;
+      gap: 28px;
+      min-height: 178px;
+      border-bottom: 1px solid var(--line);
+      transition: background 200ms ease;
+    }
+    .product-item:hover { background: var(--surface); }
+    .product-index { color: var(--blue); font-size: 13px; font-weight: 780; }
+    .product-identity { display: flex; align-items: center; gap: 16px; }
+    .product-mark {
+      flex: 0 0 auto;
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--white);
+    }
+    .product-mark svg { width: 42px; height: 42px; }
+    .product-name { margin: 0; font-size: 24px; line-height: 1.1; }
+    .product-type { display: block; margin-top: 7px; color: var(--muted); font-size: 12px; font-weight: 650; }
+    .product-role { margin: 0; font-size: 18px; font-weight: 690; line-height: 1.45; }
+    .product-desc { margin: 0; color: var(--ink-2); font-size: 14px; }
+    .product-arrow { color: var(--blue); transition: transform 180ms ease; }
+    .product-item:hover .product-arrow { transform: translateX(5px); }
+    .system-line {
+      display: grid;
+      grid-template-columns: 1fr 56px 1fr 56px 1fr;
+      align-items: center;
+      margin-top: 42px;
+      padding: 22px 26px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .system-line div { text-align: center; }
+    .system-line strong { display: block; color: var(--blue-dark); font-size: 14px; }
+    .system-line span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .system-line svg { width: 24px; margin: auto; color: var(--cyan-dark); }
+
+    .graph-section { position: relative; overflow: hidden; background: var(--surface); border-block: 1px solid var(--line); }
+    .graph-section::after {
+      content: "ATLASGRAPH";
+      position: absolute;
+      right: -18px;
+      top: 38px;
+      color: rgba(21, 94, 239, 0.045);
+      font-size: 118px;
+      font-weight: 850;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .product-lead { position: relative; z-index: 1; display: flex; align-items: center; gap: 22px; margin-bottom: 38px; }
+    .product-logo-full { width: 188px; height: auto; }
+    .product-divider { width: 1px; height: 32px; background: var(--line-strong); }
+    .product-lead span { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .graph-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 0.78fr 1.22fr; align-items: center; gap: 72px; }
+    .graph-copy .section-title { font-size: 42px; }
+    .metric-row { display: grid; grid-template-columns: repeat(2, 1fr); margin-top: 38px; border-top: 1px solid var(--line-strong); }
+    .metric { padding: 22px 18px 22px 0; border-bottom: 1px solid var(--line); }
+    .metric:nth-child(odd) { border-right: 1px solid var(--line); }
+    .metric:nth-child(even) { padding-left: 22px; }
+    .metric strong { display: block; color: var(--blue-dark); font-size: 19px; }
+    .metric span { color: var(--muted); font-size: 12px; }
+    .product-window { position: relative; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--white); box-shadow: var(--shadow); overflow: hidden; }
+    .window-bar { height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 13px; border-bottom: 1px solid var(--line); background: var(--white); }
+    .window-dots { display: flex; gap: 6px; }
+    .window-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); }
+    .window-state { display: inline-flex; align-items: center; gap: 6px; color: var(--green); font-size: 10px; font-weight: 700; }
+    .window-state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .product-window img { width: 100%; aspect-ratio: 1.68; object-fit: cover; object-position: top left; }
+    .capability-strip { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 72px; border-block: 1px solid var(--line-strong); }
+    .capability { min-height: 140px; padding: 25px 25px 25px 0; border-right: 1px solid var(--line); }
+    .capability + .capability { padding-left: 25px; }
+    .capability:last-child { border-right: 0; }
+    .capability b { display: block; margin-bottom: 8px; color: var(--ink); font-size: 15px; }
+    .capability p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .rag-section { position: relative; overflow: hidden; color: var(--white); background: var(--blue-deep); }
+    .rag-section .eyebrow { color: #9ee8f5; }
+    .rag-section .section-copy { color: #cfddf6; }
+    .rag-top { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: 90px; align-items: center; }
+    .rag-section .label { color: #d8f7fb; background: transparent; border-color: rgba(158, 232, 245, 0.4); }
+    .rag-copy .section-title { max-width: 560px; }
+    .rag-points { margin: 34px 0 0; padding: 0; list-style: none; border-top: 1px solid rgba(255,255,255,0.2); }
+    .rag-points li { display: grid; grid-template-columns: 26px 1fr; gap: 12px; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,0.14); color: #d7e4f9; font-size: 14px; }
+    .rag-points b { color: #8fe4f2; font-size: 12px; }
+    .reasoning-map { position: relative; min-height: 540px; }
+    .reasoning-map svg { width: 100%; height: 540px; }
+    .reasoning-map text { font-family: inherit; letter-spacing: 0; }
+    .rag-path { fill: none; stroke: #6fa4f2; stroke-width: 1.5; }
+    .rag-path.active { stroke: #66e0f1; stroke-width: 2.3; stroke-dasharray: 8 8; animation: signal 4s linear infinite; }
+    .rag-node { fill: #0d47ad; stroke: #a6c8ff; stroke-width: 1.5; }
+    .rag-node.hot { fill: var(--cyan); stroke: #dffcff; stroke-width: 3; }
+    .rag-box { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.24); }
+    .rag-title { fill: var(--white); font-size: 14px; font-weight: 760; }
+    .rag-note { fill: #b8cae8; font-size: 10px; font-weight: 620; }
+    .rag-flow { margin-top: 60px; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(255,255,255,0.24); }
+    .rag-step { position: relative; padding: 24px 24px 0 0; }
+    .rag-step::before { content: ""; position: absolute; top: -4px; left: 0; width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; }
+    .rag-step b { display: block; font-size: 14px; }
+    .rag-step span { display: block; margin-top: 6px; color: #b8cae8; font-size: 12px; }
+
+    .harness-section { overflow: hidden; }
+    .harness-layout { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 92px; align-items: center; }
+    .ontology-stage { position: relative; min-height: 580px; }
+    .ontology-stage::before { content: ""; position: absolute; inset: 9% 11%; border: 1px dashed var(--line-strong); border-radius: 50%; }
+    .ontology-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .ontology-stage text { font-family: inherit; letter-spacing: 0; }
+    .ontology-edge { stroke: #9abded; stroke-width: 1.5; fill: none; }
+    .ontology-edge.live { stroke: var(--cyan); stroke-width: 2.2; stroke-dasharray: 7 8; animation: signal 4.5s linear infinite; }
+    .ontology-node { fill: var(--white); stroke: var(--blue); stroke-width: 1.5; }
+    .ontology-node.main { fill: var(--blue); stroke: var(--white); stroke-width: 6; }
+    .ontology-caption { fill: var(--ink); font-size: 12px; font-weight: 720; text-anchor: middle; }
+    .ontology-caption.main { fill: var(--white); font-size: 15px; }
+    .ontology-sub { fill: var(--muted); font-size: 9px; font-weight: 620; text-anchor: middle; }
+    .harness-copy .section-title { font-size: 42px; }
+    .harness-definition { margin-top: 26px; padding-left: 18px; border-left: 3px solid var(--cyan); color: var(--ink-2); font-size: 17px; }
+    .control-list { margin-top: 38px; border-top: 1px solid var(--line-strong); }
+    .control-item { display: grid; grid-template-columns: 36px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .control-num { color: var(--blue); font-size: 12px; font-weight: 780; }
+    .control-item b { display: block; font-size: 15px; }
+    .control-item p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+
+    .scenario-section { background: var(--surface); border-block: 1px solid var(--line); }
+    .scenario-grid { display: grid; grid-template-columns: 0.72fr 1.28fr; gap: 80px; align-items: start; }
+    .journey { position: relative; border-left: 1px solid var(--line-strong); }
+    .journey-step { position: relative; display: grid; grid-template-columns: 150px 1fr; gap: 30px; padding: 0 0 36px 32px; }
+    .journey-step:last-child { padding-bottom: 0; }
+    .journey-step::before { content: ""; position: absolute; left: -6px; top: 7px; width: 11px; height: 11px; border: 3px solid var(--surface); border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+    .journey-product { color: var(--blue-dark); font-size: 14px; font-weight: 780; }
+    .journey-content b { display: block; margin-bottom: 6px; font-size: 16px; }
+    .journey-content p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .deployment-section { padding-bottom: 80px; }
+    .deployment-row { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 56px; border: 1px solid var(--line-strong); }
+    .deploy-item { position: relative; min-height: 180px; padding: 28px; border-right: 1px solid var(--line); }
+    .deploy-item:last-child { border-right: 0; }
+    .deploy-item::after { content: ""; position: absolute; right: -5px; top: 50%; width: 9px; height: 9px; border-top: 1px solid var(--blue); border-right: 1px solid var(--blue); transform: rotate(45deg); background: var(--white); }
+    .deploy-item:last-child::after { display: none; }
+    .deploy-item span { color: var(--blue); font-size: 11px; font-weight: 780; }
+    .deploy-item b { display: block; margin-top: 26px; font-size: 17px; }
+    .deploy-item p { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+
+    .final-cta { padding: 64px 0 96px; }
+    .cta-inner {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 40px;
+      min-height: 260px;
+      padding: 52px 58px;
+      color: var(--white);
+      background: var(--blue);
+      border-radius: 8px;
+    }
+    .cta-inner::after { content: ""; position: absolute; right: 18%; top: -90px; width: 270px; height: 270px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; }
+    .cta-inner h2 { position: relative; z-index: 1; max-width: 720px; margin: 0; font-size: 36px; line-height: 1.2; }
+    .cta-inner p { position: relative; z-index: 1; margin: 14px 0 0; color: #dbe9ff; }
+    .cta-inner .button { position: relative; z-index: 1; color: var(--blue-dark); background: var(--white); border-color: var(--white); }
+
+    footer { padding: 28px 0 38px; border-top: 1px solid var(--line); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; color: var(--muted); font-size: 12px; }
+    .footer-brand { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 760; }
+    .footer-brand img { width: 23px; height: 23px; object-fit: contain; }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 600ms ease, transform 600ms ease; }
+    .reveal.is-visible { opacity: 1; transform: none; }
+    @keyframes signal { to { stroke-dashoffset: -72; } }
+    @keyframes pulse { 0% { opacity: 0.8; transform: scale(0.65); } 100% { opacity: 0; transform: scale(1.5); } }
+
+    @media (max-width: 1080px) {
+      .nav { grid-template-columns: 180px 1fr 180px; }
+      .nav-links { gap: 20px; }
+      .hero-inner { grid-template-columns: 0.9fr 1.1fr; }
+      .hero h1 { font-size: 66px; }
+      .hero-heading { font-size: 29px; }
+      .network-stage { min-height: 560px; }
+      .product-item { grid-template-columns: 52px 190px 0.9fr 1.1fr 24px; gap: 18px; }
+      .graph-layout, .rag-top, .harness-layout { gap: 48px; }
+      .scenario-grid { gap: 48px; }
+    }
+
+    @media (max-width: 900px) {
+      :root { --header: 66px; }
+      .shell { width: min(calc(100% - 36px), var(--max)); }
+      .section { padding: 84px 0; }
+      .site-header { height: var(--header); }
+      .nav { grid-template-columns: 1fr auto; }
+      .nav-links {
+        position: fixed;
+        left: 18px;
+        right: 18px;
+        top: 72px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 18px 50px rgba(16,24,40,0.14);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 0 12px; }
+      .nav-actions .nav-cta { display: none; }
+      .menu-button { display: inline-grid; place-items: center; }
+      .hero-inner { min-height: auto; grid-template-columns: 1fr; padding-top: 70px; }
+      .hero-copy { max-width: 720px; }
+      .network-stage { min-height: 590px; }
+      .signal-bar { margin-top: 0; }
+      .section-head { display: block; margin-bottom: 46px; }
+      .section-head .section-copy { margin-top: 18px; }
+      .product-item { grid-template-columns: 42px 1fr 32px; min-height: 0; padding: 28px 0; }
+      .product-identity { grid-column: 2; }
+      .product-role, .product-desc { grid-column: 2; }
+      .product-arrow { grid-column: 3; grid-row: 1 / span 3; }
+      .system-line { grid-template-columns: 1fr; gap: 14px; }
+      .system-line svg { transform: rotate(90deg); }
+      .graph-layout, .rag-top, .harness-layout, .scenario-grid { grid-template-columns: 1fr; }
+      .graph-layout { gap: 52px; }
+      .capability-strip, .deployment-row { grid-template-columns: repeat(2, 1fr); }
+      .capability:nth-child(2) { border-right: 0; }
+      .capability:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .rag-top { gap: 38px; }
+      .reasoning-map { min-height: 500px; }
+      .reasoning-map svg { height: 500px; }
+      .harness-layout { gap: 24px; }
+      .ontology-stage { order: 2; min-height: 520px; }
+      .deployment-row { border-bottom: 0; }
+      .deploy-item { border-bottom: 1px solid var(--line); }
+      .deploy-item:nth-child(2) { border-right: 0; }
+      .deploy-item:nth-child(2)::after { display: none; }
+      .cta-inner { grid-template-columns: 1fr; padding: 44px; }
+    }
+
+    @media (max-width: 620px) {
+      .shell { width: min(calc(100% - 28px), var(--max)); }
+      .section { padding: 72px 0; }
+      .section-title { font-size: 34px; }
+      .section-copy { font-size: 16px; }
+      .brand-note { display: none; }
+      .nav-actions { gap: 6px; }
+      .lang-switch button { min-width: 36px; padding: 0 7px; }
+      .hero::before { height: 26%; }
+      .hero-inner { gap: 12px; padding-top: 56px; padding-bottom: 44px; }
+      .hero h1 { font-size: 52px; }
+      .hero-heading { font-size: 26px; }
+      .hero-description { font-size: 16px; }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .button { width: 100%; }
+      .network-stage { min-height: 420px; margin-inline: -16px; }
+      .stage-caption { right: 16px; bottom: 2%; gap: 12px; font-size: 9px; }
+      .signal-inner { grid-template-columns: 1fr; padding: 8px 0; }
+      .signal-item { padding: 15px 22px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .signal-item:last-child { border-bottom: 0; }
+      .system-section { padding-top: 88px; }
+      .product-item { grid-template-columns: 32px 1fr 24px; gap: 12px; }
+      .product-mark { width: 48px; height: 48px; }
+      .product-mark svg { width: 34px; height: 34px; }
+      .product-name { font-size: 20px; }
+      .product-role { font-size: 16px; }
+      .graph-section::after { display: none; }
+      .product-lead { align-items: flex-start; flex-direction: column; gap: 12px; }
+      .product-divider { width: 34px; height: 1px; }
+      .graph-copy .section-title, .harness-copy .section-title { font-size: 34px; }
+      .metric-row { grid-template-columns: 1fr; }
+      .metric:nth-child(odd) { border-right: 0; }
+      .metric:nth-child(even) { padding-left: 0; }
+      .capability-strip, .deployment-row { grid-template-columns: 1fr; }
+      .capability, .capability + .capability { min-height: 0; padding: 22px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .rag-flow { grid-template-columns: repeat(2, 1fr); gap: 28px 0; }
+      .reasoning-map { min-height: 400px; margin-inline: -12px; }
+      .reasoning-map svg { height: 400px; }
+      .ontology-stage { min-height: 410px; margin-inline: -12px; }
+      .journey-step { grid-template-columns: 1fr; gap: 7px; padding-left: 24px; }
+      .deploy-item { min-height: 0; border-right: 0; }
+      .deploy-item::after { display: none; }
+      .cta-inner { min-height: 0; padding: 34px 26px; }
+      .cta-inner h2 { font-size: 28px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-zh="跳到主要内容" data-en="Skip to main content">跳到主要内容</a>
+
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Atlas home">
+        <img src="images/AtlasGraph-logo-256.png" alt="">
+        <span><span class="brand-name">Atlas</span><small class="brand-note">GRAPH-LLM INFRASTRUCTURE</small></span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="#products" data-zh="产品体系" data-en="Products">产品体系</a>
+        <a href="#atlasgraph">AtlasGraph</a>
+        <a href="#atlasrag">AtlasRAG</a>
+        <a href="#atlasharness">AtlasHarness</a>
+        <a href="#deployment" data-zh="企业部署" data-en="Enterprise">企业部署</a>
+      </div>
+      <div class="nav-actions">
+        <div class="lang-switch" aria-label="Language">
+          <button type="button" data-lang="zh" aria-pressed="true">中</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <a class="nav-cta" href="#contact" data-zh="预约演示" data-en="Book a demo">预约演示</a>
+        <button class="menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="navLinks" aria-label="打开菜单">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-inner shell">
+        <div class="hero-copy reveal">
+          <p class="hero-kicker"><i></i><span data-zh="图模融合基础设施" data-en="Graph-LLM Fusion Infrastructure">图模融合基础设施</span></p>
+          <h1>Atlas</h1>
+          <h2 class="hero-heading" data-zh="让企业 AI 建立在可计算、可推理、可控制的图上" data-en="Build enterprise AI on graphs that can compute, reason, and govern">让企业 AI 建立在可计算、可推理、可控制的图上</h2>
+          <p class="hero-description" data-zh="以云原生图数据库为底座，构建 GraphRAG 与 Agent 控制设施，让知识、上下文、任务和执行过程可查询、可治理、可追溯。" data-en="Built on a cloud-native graph database, Atlas connects GraphRAG with agent control infrastructure, making knowledge, context, tasks, and execution queryable, governable, and traceable.">以云原生图数据库为底座，构建 GraphRAG 与 Agent 控制设施，让知识、上下文、任务和执行过程可查询、可治理、可追溯。</p>
+          <div class="hero-actions">
+            <a class="button" href="#products"><span data-zh="探索产品体系" data-en="Explore products">探索产品体系</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a>
+            <a class="button secondary" href="#atlasgraph" data-zh="了解 AtlasGraph" data-en="Discover AtlasGraph">了解 AtlasGraph</a>
+          </div>
+          <div class="hero-footnote" aria-label="Platform characteristics">
+            <span data-zh="Rust 构建" data-en="Built with Rust">Rust 构建</span>
+            <span data-zh="图原生语义" data-en="Graph-native semantics">图原生语义</span>
+            <span data-zh="企业级控制" data-en="Enterprise control">企业级控制</span>
+          </div>
+        </div>
+
+        <div class="network-stage reveal" aria-label="Atlas Graph-LLM fusion architecture">
+          <svg class="hero-network" viewBox="0 0 720 660" role="img" aria-labelledby="heroVisualTitle heroVisualDesc">
+            <title id="heroVisualTitle">Atlas Graph-LLM fusion</title>
+            <desc id="heroVisualDesc">AtlasGraph connects enterprise knowledge to AtlasRAG reasoning and AtlasHarness controlled execution.</desc>
+            <path class="edge" d="M120 170L245 238L360 178L506 232L620 146"/>
+            <path class="edge" d="M90 340L245 238L314 352L506 232L632 356"/>
+            <path class="edge" d="M114 500L314 352L434 472L632 356"/>
+            <path class="edge" d="M245 238L434 472M360 178L314 352M506 232L434 472"/>
+            <path class="edge signal" d="M92 340C180 324 223 344 314 352S468 320 632 356"/>
+            <path class="edge signal cyan" d="M120 170C272 82 460 94 620 146"/>
+            <circle class="pulse" cx="314" cy="352" r="72"/>
+            <circle class="node" cx="120" cy="170" r="14"/><circle class="node" cx="245" cy="238" r="12"/>
+            <circle class="node" cx="360" cy="178" r="10"/><circle class="node" cx="506" cy="232" r="13"/>
+            <circle class="node" cx="620" cy="146" r="17"/><circle class="node" cx="90" cy="340" r="10"/>
+            <circle class="node core" cx="314" cy="352" r="70"/><circle class="node accent" cx="434" cy="472" r="18"/>
+            <circle class="node" cx="632" cy="356" r="13"/><circle class="node" cx="114" cy="500" r="15"/>
+            <text class="core-label" x="314" y="357">AtlasGraph</text>
+            <text class="product" x="523" y="103">AtlasRAG</text>
+            <text class="micro" x="523" y="122">Semantic reasoning</text>
+            <text class="product" x="460" y="516">AtlasHarness</text>
+            <text class="micro" x="460" y="535">Ontology control</text>
+            <text class="micro" x="70" y="146">Enterprise knowledge</text>
+            <text class="micro" x="72" y="527">Systems &amp; actions</text>
+          </svg>
+          <div class="stage-caption"><span>GRAPH DATA</span><span>LLM CONTEXT</span><span>CONTROLLED ACTION</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="signal-bar shell reveal" aria-label="Atlas platform foundation">
+      <div class="signal-inner">
+        <div class="signal-item"><strong>One Graph</strong><span data-zh="统一知识、关系与状态" data-en="Unify knowledge, relations, and state">统一知识、关系与状态</span></div>
+        <div class="signal-item"><strong>Grounded Reasoning</strong><span data-zh="以关联上下文约束模型" data-en="Ground models in connected context">以关联上下文约束模型</span></div>
+        <div class="signal-item"><strong>Governed Execution</strong><span data-zh="从任务规划到执行审计" data-en="From task planning to execution audit">从任务规划到执行审计</span></div>
+      </div>
+    </div>
+
+    <section class="section system-section" id="products">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div>
+            <p class="eyebrow" data-zh="图模融合产品体系" data-en="Graph-LLM Product System">图模融合产品体系</p>
+            <h2 class="section-title" data-zh="以图数据为核心，贯通检索、推理与执行" data-en="Center retrieval, reasoning, and execution on graph data">以图数据为核心，贯通检索、推理与执行</h2>
+          </div>
+          <p class="section-copy" data-zh="共享图语义与治理边界：从数据结构开始，为模型提供可靠上下文，并将 Agent 行为纳入企业控制。" data-en="Share graph semantics and governance boundaries: structure data, ground model context, and bring agent behavior under enterprise control.">共享图语义与治理边界：从数据结构开始，为模型提供可靠上下文，并将 Agent 行为纳入企业控制。</p>
+        </div>
+
+        <div class="product-rail reveal">
+          <a class="product-item" href="#atlasgraph">
+            <span class="product-index">01</span>
+            <div class="product-identity">
+              <span class="product-mark" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="11" rx="14" ry="6" fill="#EAF3FF" stroke="#155EEF" stroke-width="2"/><path d="M10 11v22c0 3.3 6.3 6 14 6s14-2.7 14-6V11" stroke="#155EEF" stroke-width="2"/><path d="M10 22c0 3.3 6.3 6 14 6s14-2.7 14-6" stroke="#155EEF" stroke-width="2"/><circle cx="18" cy="17" r="2.4" fill="#06B6D4"/><circle cx="30" cy="20" r="2.4" fill="#155EEF"/><path d="M20.2 17.7l7.5 1.6" stroke="#0E7490" stroke-width="1.5"/></svg>
+              </span>
+              <span><h3 class="product-name">AtlasGraph</h3><span class="product-type" data-zh="云原生图数据库" data-en="Cloud-native graph database">云原生图数据库</span></span>
+            </div>
+            <p class="product-role" data-zh="图数据核心" data-en="The graph data core">图数据核心</p>
+            <p class="product-desc" data-zh="统一存储实体、关系、事件与状态，为复杂关联查询和上层 AI 提供实时图计算。" data-en="Unify entities, relations, events, and state for real-time graph computation and AI workloads.">统一存储实体、关系、事件与状态，为复杂关联查询和上层 AI 提供实时图计算。</p>
+            <span class="product-arrow">→</span>
+          </a>
+
+          <a class="product-item" href="#atlasrag">
+            <span class="product-index">02</span>
+            <div class="product-identity">
+              <span class="product-mark" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none"><path d="M9 8h18l7 7v25H9z" fill="#F5F9FF" stroke="#155EEF" stroke-width="2"/><path d="M27 8v8h7M15 22h13M15 28h9" stroke="#155EEF" stroke-width="2"/><circle cx="35" cy="31" r="7" fill="white" stroke="#06B6D4" stroke-width="2"/><path d="M40 36l4 4M31 31h8M35 27v8" stroke="#0E7490" stroke-width="2"/></svg>
+              </span>
+              <span><h3 class="product-name">AtlasRAG</h3><span class="product-type" data-zh="图增强检索与推理" data-en="Graph-enhanced retrieval and reasoning">图增强检索与推理</span></span>
+            </div>
+            <p class="product-role" data-zh="语义推理层" data-en="The semantic reasoning layer">语义推理层</p>
+            <p class="product-desc" data-zh="用拓扑关系定位知识，动态构造子图上下文，并保留可解释的推理路径。" data-en="Locate knowledge through topology, build dynamic subgraph context, and preserve explainable reasoning paths.">用拓扑关系定位知识，动态构造子图上下文，并保留可解释的推理路径。</p>
+            <span class="product-arrow">→</span>
+          </a>
+
+          <a class="product-item" href="#atlasharness">
+            <span class="product-index">03</span>
+            <div class="product-identity">
+              <span class="product-mark" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="7" fill="#155EEF"/><circle cx="10" cy="14" r="4" fill="#EAF3FF" stroke="#155EEF" stroke-width="2"/><circle cx="38" cy="13" r="4" fill="#EAF3FF" stroke="#155EEF" stroke-width="2"/><circle cx="39" cy="35" r="4" fill="#E6FAFD" stroke="#06B6D4" stroke-width="2"/><circle cx="10" cy="36" r="4" fill="#EAF3FF" stroke="#155EEF" stroke-width="2"/><path d="M13.5 16l5.5 4M29 20l5.5-4.5M30 28l5.7 4M18.5 28.5l-5 4.5" stroke="#155EEF" stroke-width="2"/><path d="M21 24h6M24 21v6" stroke="white" stroke-width="1.5"/></svg>
+              </span>
+              <span><h3 class="product-name">AtlasHarness</h3><span class="product-type" data-zh="Ontology 驱动的 Agent Harness" data-en="Ontology-driven Agent Harness">Ontology 驱动的 Agent Harness</span></span>
+            </div>
+            <p class="product-role" data-zh="可控执行层" data-en="The governed execution layer">可控执行层</p>
+            <p class="product-desc" data-zh="以图数据库为基础设施，用 Ontology 组织任务、技能、规则与状态，让 Agent 执行可治理。" data-en="Built on graph infrastructure, it organizes tasks, skills, rules, and state through ontology for governed agent execution.">以图数据库为基础设施，用 Ontology 组织任务、技能、规则与状态，让 Agent 执行可治理。</p>
+            <span class="product-arrow">→</span>
+          </a>
+        </div>
+
+        <div class="system-line reveal" aria-label="Product value flow">
+          <div><strong>AtlasGraph</strong><span data-zh="关系成为可计算数据" data-en="Relations become computable data">关系成为可计算数据</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 12h16M15 7l5 5-5 5"/></svg>
+          <div><strong>AtlasRAG</strong><span data-zh="数据成为可靠上下文" data-en="Data becomes grounded context">数据成为可靠上下文</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 12h16M15 7l5 5-5 5"/></svg>
+          <div><strong>AtlasHarness</strong><span data-zh="上下文驱动可控行动" data-en="Context drives governed action">上下文驱动可控行动</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section graph-section" id="atlasgraph">
+      <div class="shell">
+        <div class="product-lead reveal">
+          <img class="product-logo-full" src="images/logo.png" alt="AtlasGraph">
+          <span class="product-divider"></span>
+          <span data-zh="图模融合的实时数据底座" data-en="The real-time data foundation for Graph-LLM fusion">图模融合的实时数据底座</span>
+        </div>
+        <div class="graph-layout">
+          <div class="graph-copy reveal">
+            <span class="label" data-zh="云原生图数据库" data-en="Cloud-native graph database">云原生图数据库</span>
+            <h2 class="section-title" data-zh="让复杂关系在生产环境中实时计算" data-en="Compute complex relationships in production, in real time">让复杂关系在生产环境中实时计算</h2>
+            <p class="section-copy" data-zh="AtlasGraph 面向企业级关联数据场景，以 Rust 构建高性能内核，支持分布式存储、实时并行图计算和 OpenCypher 查询。" data-en="AtlasGraph is built for enterprise connected-data workloads, with a high-performance Rust core, distributed storage, real-time parallel graph computing, and OpenCypher queries.">AtlasGraph 面向企业级关联数据场景，以 Rust 构建高性能内核，支持分布式存储、实时并行图计算和 OpenCypher 查询。</p>
+            <div class="metric-row">
+              <div class="metric"><strong data-zh="毫秒级" data-en="Millisecond">毫秒级</strong><span data-zh="高并发关联查询" data-en="Concurrent relationship queries">高并发关联查询</span></div>
+              <div class="metric"><strong data-zh="万亿级" data-en="Trillion-scale">万亿级</strong><span data-zh="图数据存储与计算" data-en="Graph storage and computing">图数据存储与计算</span></div>
+              <div class="metric"><strong>OpenCypher</strong><span data-zh="开放查询语言生态" data-en="Open query language ecosystem">开放查询语言生态</span></div>
+              <div class="metric"><strong data-zh="云原生" data-en="Cloud-native">云原生</strong><span data-zh="弹性扩展与高可用" data-en="Elastic scale and high availability">弹性扩展与高可用</span></div>
+            </div>
+          </div>
+          <div class="product-window reveal" aria-label="AtlasGraph Studio interface">
+            <div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span class="window-state" data-zh="实时查询" data-en="Live query">实时查询</span></div>
+            <img src="images/AtlasGraph-product-feature-studio-2.png" alt="AtlasGraph Studio graph query and visualization interface">
+          </div>
+        </div>
+        <div class="capability-strip reveal">
+          <div class="capability"><b data-zh="高性能内核" data-en="High-performance core">高性能内核</b><p data-zh="存储与计算协同优化，服务低延迟关联查询。" data-en="Co-optimized storage and compute for low-latency relationship queries.">存储与计算协同优化，服务低延迟关联查询。</p></div>
+          <div class="capability"><b data-zh="分布式架构" data-en="Distributed architecture">分布式架构</b><p data-zh="水平扩展、负载均衡、故障检测与自动恢复。" data-en="Horizontal scale, load balancing, failure detection, and recovery.">水平扩展、负载均衡、故障检测与自动恢复。</p></div>
+          <div class="capability"><b>AtlasStudio</b><p data-zh="可视化建模、图查询、探索分析与运维管理。" data-en="Visual modeling, graph queries, exploration, and operations.">可视化建模、图查询、探索分析与运维管理。</p></div>
+          <div class="capability"><b data-zh="算法与工具生态" data-en="Algorithms and tooling">算法与工具生态</b><p data-zh="图算法、APOC、数据工具与多语言 SDK。" data-en="Graph algorithms, APOC, data tools, and multilingual SDKs.">图算法、APOC、数据工具与多语言 SDK。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section rag-section" id="atlasrag">
+      <div class="shell">
+        <div class="rag-top">
+          <div class="rag-copy reveal">
+            <p class="eyebrow">AtlasRAG</p>
+            <span class="label" data-zh="超越向量搜索" data-en="Beyond vector search">超越向量搜索</span>
+            <h2 class="section-title" data-zh="用图关系为 LLM 提供可推理的上下文" data-en="Give LLMs context they can reason over">用图关系为 LLM 提供可推理的上下文</h2>
+            <p class="section-copy" data-zh="不再只返回相似片段。AtlasRAG 将实体、关系和路径组织成动态子图，让模型看到问题背后的完整语义结构。" data-en="Go beyond similar chunks. AtlasRAG organizes entities, relationships, and paths into dynamic subgraphs so models can see the semantic structure behind a question.">不再只返回相似片段。AtlasRAG 将实体、关系和路径组织成动态子图，让模型看到问题背后的完整语义结构。</p>
+            <ul class="rag-points">
+              <li><b>01</b><span data-zh="Agent 分析查询，规划多跳检索路径" data-en="An agent analyzes the query and plans a multi-hop retrieval path">Agent 分析查询，规划多跳检索路径</span></li>
+              <li><b>02</b><span data-zh="沿图拓扑定位跨文档知识" data-en="Graph topology locates knowledge across documents">沿图拓扑定位跨文档知识</span></li>
+              <li><b>03</b><span data-zh="为 LLM 生成结构化、可解释的子图上下文" data-en="Structured, explainable subgraph context is generated for the LLM">为 LLM 生成结构化、可解释的子图上下文</span></li>
+            </ul>
+          </div>
+          <div class="reasoning-map reveal" aria-label="AtlasRAG semantic reasoning flow">
+            <svg viewBox="0 0 650 540" role="img">
+              <rect class="rag-box" x="20" y="56" width="142" height="92" rx="6"/>
+              <rect class="rag-box" x="480" y="386" width="146" height="92" rx="6"/>
+              <text class="rag-title" x="42" y="91">USER QUERY</text><text class="rag-note" x="42" y="113">supplier risk + policy</text>
+              <text class="rag-title" x="502" y="421">GROUNDED ANSWER</text><text class="rag-note" x="502" y="443">facts + reasoning path</text>
+              <path class="rag-path active" d="M162 102C244 88 246 180 314 192S415 169 478 207"/>
+              <path class="rag-path" d="M314 192L252 288L346 326L478 207L538 306L480 386"/>
+              <path class="rag-path" d="M252 288L146 250L94 344L208 404L346 326L428 412"/>
+              <path class="rag-path active" d="M94 344C210 312 322 372 428 412S504 388 550 386"/>
+              <path class="rag-path" d="M146 250L314 192M208 404L252 288M346 326L428 412M478 207L538 306"/>
+              <circle class="rag-node" cx="314" cy="192" r="15"/><circle class="rag-node hot" cx="252" cy="288" r="17"/>
+              <circle class="rag-node" cx="346" cy="326" r="13"/><circle class="rag-node hot" cx="478" cy="207" r="15"/>
+              <circle class="rag-node" cx="146" cy="250" r="11"/><circle class="rag-node" cx="94" cy="344" r="14"/>
+              <circle class="rag-node hot" cx="208" cy="404" r="12"/><circle class="rag-node" cx="428" cy="412" r="15"/>
+              <circle class="rag-node" cx="538" cy="306" r="12"/>
+              <text class="rag-note" x="280" y="167">Task planner</text><text class="rag-note" x="214" y="319">Entity</text>
+              <text class="rag-note" x="454" y="178">Evidence</text><text class="rag-note" x="384" y="446">Reasoning path</text>
+            </svg>
+          </div>
+        </div>
+        <div class="rag-flow reveal">
+          <div class="rag-step"><b data-zh="理解问题" data-en="Understand">理解问题</b><span data-zh="识别意图、实体与约束" data-en="Identify intent, entities, and constraints">识别意图、实体与约束</span></div>
+          <div class="rag-step"><b data-zh="规划检索" data-en="Plan">规划检索</b><span data-zh="构建面向任务的检索 DAG" data-en="Build a task-directed retrieval DAG">构建面向任务的检索 DAG</span></div>
+          <div class="rag-step"><b data-zh="生成子图" data-en="Ground">生成子图</b><span data-zh="聚合相关实体、关系与证据" data-en="Aggregate entities, relations, and evidence">聚合相关实体、关系与证据</span></div>
+          <div class="rag-step"><b data-zh="解释答案" data-en="Explain">解释答案</b><span data-zh="保留从事实到结论的路径" data-en="Preserve the path from facts to conclusion">保留从事实到结论的路径</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section harness-section" id="atlasharness">
+      <div class="shell harness-layout">
+        <div class="ontology-stage reveal" aria-label="AtlasHarness ontology model">
+          <svg viewBox="0 0 600 580" role="img">
+            <path class="ontology-edge live" d="M300 290L150 132M300 290L448 118M300 290L506 294M300 290L436 466M300 290L160 470M300 290L82 294"/>
+            <path class="ontology-edge" d="M150 132L448 118L506 294L436 466L160 470L82 294Z"/>
+            <circle class="ontology-node main" cx="300" cy="290" r="76"/>
+            <circle class="ontology-node" cx="150" cy="132" r="48"/><circle class="ontology-node" cx="448" cy="118" r="48"/>
+            <circle class="ontology-node" cx="506" cy="294" r="48"/><circle class="ontology-node" cx="436" cy="466" r="48"/>
+            <circle class="ontology-node" cx="160" cy="470" r="48"/><circle class="ontology-node" cx="82" cy="294" r="48"/>
+            <text class="ontology-caption main" x="300" y="285">Ontology</text><text class="ontology-caption main" x="300" y="306">Control Graph</text>
+            <text class="ontology-caption" x="150" y="128">Task</text><text class="ontology-sub" x="150" y="147">goal &amp; plan</text>
+            <text class="ontology-caption" x="448" y="114">Skill</text><text class="ontology-sub" x="448" y="133">capability</text>
+            <text class="ontology-caption" x="506" y="290">Rule</text><text class="ontology-sub" x="506" y="309">policy</text>
+            <text class="ontology-caption" x="436" y="462">Audit</text><text class="ontology-sub" x="436" y="481">trace</text>
+            <text class="ontology-caption" x="160" y="466">State</text><text class="ontology-sub" x="160" y="485">checkpoint</text>
+            <text class="ontology-caption" x="82" y="290">Memory</text><text class="ontology-sub" x="82" y="309">context</text>
+          </svg>
+        </div>
+        <div class="harness-copy reveal">
+          <p class="eyebrow">AtlasHarness</p>
+          <span class="label" data-zh="Ontology 驱动的 Agent Harness" data-en="Ontology-driven Agent Harness">Ontology 驱动的 Agent Harness</span>
+          <h2 class="section-title" data-zh="把 Agent 的行动放进企业可治理的图中" data-en="Bring agent actions into an enterprise-governed graph">把 Agent 的行动放进企业可治理的图中</h2>
+          <p class="harness-definition" data-zh="AtlasHarness 以 AtlasGraph 为基础设施，用 Ontology 定义业务对象、任务、技能、规则、状态与审计关系，让 Agent 理解环境、规划任务并在边界内执行。" data-en="Built on AtlasGraph, AtlasHarness uses ontology to define business objects, tasks, skills, rules, state, and audit relationships, so agents can understand, plan, and act within enterprise boundaries.">AtlasHarness 以 AtlasGraph 为基础设施，用 Ontology 定义业务对象、任务、技能、规则、状态与审计关系，让 Agent 理解环境、规划任务并在边界内执行。</p>
+          <div class="control-list">
+            <div class="control-item"><span class="control-num">01</span><div><b data-zh="可理解" data-en="Understandable">可理解</b><p data-zh="将业务对象、权限和环境状态映射为机器可读取的语义图。" data-en="Map business objects, permissions, and environment state into a machine-readable semantic graph.">将业务对象、权限和环境状态映射为机器可读取的语义图。</p></div></div>
+            <div class="control-item"><span class="control-num">02</span><div><b data-zh="可执行" data-en="Executable">可执行</b><p data-zh="把目标拆解为任务与技能调用，并管理检查点、恢复和副作用。" data-en="Decompose goals into tasks and skill calls while managing checkpoints, recovery, and side effects.">把目标拆解为任务与技能调用，并管理检查点、恢复和副作用。</p></div></div>
+            <div class="control-item"><span class="control-num">03</span><div><b data-zh="可治理" data-en="Governable">可治理</b><p data-zh="接入权限、审批、策略与审计，记录每一次决策和执行路径。" data-en="Connect permissions, approvals, policies, and audit to record every decision and execution path.">接入权限、审批、策略与审计，记录每一次决策和执行路径。</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section scenario-section">
+      <div class="shell scenario-grid">
+        <div class="reveal">
+          <p class="eyebrow" data-zh="三层协同" data-en="Three layers working together">三层协同</p>
+          <h2 class="section-title" data-zh="从一个采购 Agent，看图模融合如何落地" data-en="See Graph-LLM fusion through a procurement agent">从一个采购 Agent，看图模融合如何落地</h2>
+          <p class="section-copy" data-zh="同一张图贯通企业事实、模型上下文和执行状态，减少信息断裂与不可解释决策。" data-en="One graph connects enterprise facts, model context, and execution state, reducing fragmented information and opaque decisions.">同一张图贯通企业事实、模型上下文和执行状态，减少信息断裂与不可解释决策。</p>
+        </div>
+        <div class="journey reveal">
+          <div class="journey-step"><span class="journey-product">AtlasGraph</span><div class="journey-content"><b data-zh="发现供应链关系与风险" data-en="Discover supply-chain relations and risk">发现供应链关系与风险</b><p data-zh="连接供应商、合同、物料、交易与风险事件，实时查询多跳影响。" data-en="Connect suppliers, contracts, materials, transactions, and risk events for real-time multi-hop analysis.">连接供应商、合同、物料、交易与风险事件，实时查询多跳影响。</p></div></div>
+          <div class="journey-step"><span class="journey-product">AtlasRAG</span><div class="journey-content"><b data-zh="构造有证据的决策上下文" data-en="Build evidence-backed decision context">构造有证据的决策上下文</b><p data-zh="沿关系检索政策、历史合作和替代方案，生成可解释的子图上下文。" data-en="Retrieve policies, history, and alternatives along graph relations to build explainable subgraph context.">沿关系检索政策、历史合作和替代方案，生成可解释的子图上下文。</p></div></div>
+          <div class="journey-step"><span class="journey-product">AtlasHarness</span><div class="journey-content"><b data-zh="在审批和权限边界内执行" data-en="Execute within approval and permission boundaries">在审批和权限边界内执行</b><p data-zh="规划询价、比价和审批任务，调用企业系统并记录完整执行链路。" data-en="Plan sourcing, comparison, and approval tasks, call enterprise systems, and record the full execution chain.">规划询价、比价和审批任务，调用企业系统并记录完整执行链路。</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section deployment-section" id="deployment">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div>
+            <p class="eyebrow" data-zh="企业级落地" data-en="Enterprise deployment">企业级落地</p>
+            <h2 class="section-title" data-zh="从图数据库走向 AI 运行底座" data-en="From graph database to an AI runtime foundation">从图数据库走向 AI 运行底座</h2>
+          </div>
+          <p class="section-copy" data-zh="对接业务系统、权限系统、审批流程和模型服务，建立可持续演进的企业 AI 基础设施。" data-en="Connect business systems, identity and access, approval workflows, and model services into infrastructure that can evolve with the enterprise.">对接业务系统、权限系统、审批流程和模型服务，建立可持续演进的企业 AI 基础设施。</p>
+        </div>
+        <div class="deployment-row reveal">
+          <div class="deploy-item"><span>01 / CONNECT</span><b data-zh="接入企业数据" data-en="Connect enterprise data">接入企业数据</b><p data-zh="结构化数据、文档、事件流与外部知识。" data-en="Structured data, documents, event streams, and external knowledge.">结构化数据、文档、事件流与外部知识。</p></div>
+          <div class="deploy-item"><span>02 / MODEL</span><b data-zh="构建图语义" data-en="Model graph semantics">构建图语义</b><p data-zh="统一实体、关系、Ontology 与业务规则。" data-en="Unify entities, relationships, ontology, and business rules.">统一实体、关系、Ontology 与业务规则。</p></div>
+          <div class="deploy-item"><span>03 / OPERATE</span><b data-zh="运行 AI 应用" data-en="Operate AI applications">运行 AI 应用</b><p data-zh="服务 GraphRAG、Agent 与行业智能应用。" data-en="Power GraphRAG, agents, and industry AI applications.">服务 GraphRAG、Agent 与行业智能应用。</p></div>
+          <div class="deploy-item"><span>04 / SUPPORT</span><b>AtlasSupport</b><p data-zh="部署、迁移、治理与生产保障服务。" data-en="Deployment, migration, governance, and production support.">部署、迁移、治理与生产保障服务。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" id="contact">
+      <div class="shell cta-inner reveal">
+        <div>
+          <h2 data-zh="从一张关键业务图开始，建立企业的图模融合能力" data-en="Start with one critical business graph and build your Graph-LLM capability">从一张关键业务图开始，建立企业的图模融合能力</h2>
+          <p data-zh="与 Atlas 团队讨论图数据库、GraphRAG 或 Agent Harness 的落地路径。" data-en="Talk with the Atlas team about your path to graph databases, GraphRAG, or Agent Harness.">与 Atlas 团队讨论图数据库、GraphRAG 或 Agent Harness 的落地路径。</p>
+        </div>
+        <a class="button" href="mailto:contact@atlasgraph.io"><span data-zh="联系 Atlas 团队" data-en="Contact Atlas">联系 Atlas 团队</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner shell">
+      <span class="footer-brand"><img src="images/AtlasGraph-logo-256.png" alt="">Atlas</span>
+      <span data-zh="Graph-LLM Fusion Infrastructure · 图数据、语义推理与可控执行" data-en="Graph-LLM Fusion Infrastructure · Graph data, semantic reasoning, and governed execution">Graph-LLM Fusion Infrastructure · 图数据、语义推理与可控执行</span>
+      <span>© 2026 Atlas</span>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const menuButton = document.getElementById('menuButton');
+      const navLinks = document.getElementById('navLinks');
+      const languageButtons = document.querySelectorAll('[data-lang]');
+      const translatable = document.querySelectorAll('[data-zh][data-en]');
+
+      const applyLanguage = (lang) => {
+        const next = lang === 'en' ? 'en' : 'zh';
+        root.lang = next === 'zh' ? 'zh-CN' : 'en';
+        translatable.forEach((element) => {
+          element.textContent = element.dataset[next];
+        });
+        languageButtons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.lang === next));
+        });
+        menuButton.setAttribute('aria-label', next === 'zh' ? '打开菜单' : 'Open menu');
+        document.title = next === 'zh' ? 'Atlas | 图模融合基础设施' : 'Atlas | Graph-LLM Fusion Infrastructure';
+        localStorage.setItem('atlasLang', next);
+      };
+
+      const storedLanguage = localStorage.getItem('atlasLang');
+      const systemLanguage = navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      applyLanguage(storedLanguage || systemLanguage);
+
+      languageButtons.forEach((button) => button.addEventListener('click', () => applyLanguage(button.dataset.lang)));
+
+      menuButton.addEventListener('click', () => {
+        const open = navLinks.classList.toggle('open');
+        menuButton.setAttribute('aria-expanded', String(open));
+      });
+      navLinks.addEventListener('click', (event) => {
+        if (event.target.closest('a')) {
+          navLinks.classList.remove('open');
+          menuButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+      } else {
+        document.querySelectorAll('.reveal').forEach((element) => element.classList.add('is-visible'));
+      }
+    })();
+  </script>
+</body>
 </html>
